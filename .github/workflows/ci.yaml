@@ -10,7 +10,7 @@ env:
 
 jobs:
     build-scan-sign:
-        runs-on: ubantu-latest
+        runs-on: ubuntu-latest
 
         steps:
             - name: Checkout Code
