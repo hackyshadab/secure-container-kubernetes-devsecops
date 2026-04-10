@@ -44,12 +44,14 @@ jobs:
                 echo "${{ secrets.COSIGN_PRIVATE_KEY_B64 }}" | base64 -d > cosign.key
 
             - name: Sign Image with Cosign
+              env:
+                COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
               run: |
                 cosign sign --key cosign.key $REGISTRY/$IMAGE_NAME:${{ github.sha }}
 
             - name: Update Kubarnetes Manifest Image Tag
               run: |
-                sed -i "s|image:.*|image: $REGISTRY/$IMAGE_NAME:${{ github.sha }}|g" k8s/base/deployment.yaml
+                sed -i "s|image: .*secure-app.*|image: $REGISTRY/$IMAGE_NAME:${{ github.sha }}|g" k8s/base/deployment.yaml
 
             - name: Commit & Push Changes
               run: |
