@@ -25,7 +25,7 @@ jobs:
               with:
                 image-ref: $REGISTRY/$IMAGE_NAME:${{ github.sha }}
                 format: 'table'
-                exit: '1'
+                exit-code: '1'
                 severity: 'CRICTICAL,HIGH'
 
             - name: Install Cosign
