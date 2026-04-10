@@ -39,11 +39,13 @@ jobs:
               run: |
                 docker push $REGISTRY/$IMAGE_NAME:${{ github.sha }}
 
+            - name: Decode Cosign Key
+              run: |
+                echo "${{ secrets.COSIGN_PRIVATE_KEY_B64 }}" | base64 -d > cosign.key
+
             - name: Sign Image with Cosign
               run: |
-                cosign sign --key env://COSIGN_PRIVATE_KEY $REGISTRY/$IMAGE_NAME:${{ github.sha }}
-              env:
-                COSIGN_PRIVATE_KEY: ${{ secrets.COSIGN_PRIVATE_KEY }}
+                cosign sign --key cosign.key $REGISTRY/$IMAGE_NAME:${{ github.sha }}
 
             - name: Update Kubarnetes Manifest Image Tag
               run: |
