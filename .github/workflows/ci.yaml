@@ -47,7 +47,7 @@ jobs:
               env:
                 COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
               run: |
-                cosign sign --key cosign.key $REGISTRY/$IMAGE_NAME:${{ github.sha }}
+                cosign sign --yes --key cosign.key $REGISTRY/$IMAGE_NAME:${{ github.sha }}
 
             - name: Update Kubarnetes Manifest Image Tag
               run: |
