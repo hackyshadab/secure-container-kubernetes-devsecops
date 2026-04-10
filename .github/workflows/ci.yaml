@@ -4,6 +4,9 @@ on:
     push:
         branches: [ "main" ]
 
+permissions:
+  contents: write
+
 env:
     IMAGE_NAME: secure-app
     REGISTRY: docker.io/shadab256
