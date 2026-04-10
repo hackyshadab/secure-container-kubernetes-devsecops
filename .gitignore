@@ -1,0 +1,4 @@
+.cache/
+.trivy-cache/
+cosign.key
+*.db

@@ -31,6 +31,7 @@ jobs:
                 exit-code: '1'
                 severity: 'CRITICAL'
                 ignore-unfixed: true
+                cache-dir: .trivy-cache
 
             - name: Install Cosign
               uses: sigstore/cosign-installer@v3
@@ -60,7 +61,7 @@ jobs:
               run: |
                 git config --global user.email "shadab@devsecops.com"
                 git config --global user.name "Shadab"
-                git add .
+                git add k8s/base/deployment.yaml .gitignore
                 git commit -m "Update image tag to ${{ github.sha }}"
                 git push
               
