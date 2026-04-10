@@ -1,0 +1,10 @@
+- rule: Detect Shell in Container 
+  desc: Shell spawned inside Container
+  condition: container and shell_procs
+  output: "Shell detected (container=%container.id)"
+
+- rule: Sensitive File Access
+  desc: Access to /etc/passwd or shadow
+  condition: open_read and fd.name in (/etc/passwd, /etc/shadow)
+  output: "Sensitive file accessed (file=%fd.name)"
+  priority: CRITICAL

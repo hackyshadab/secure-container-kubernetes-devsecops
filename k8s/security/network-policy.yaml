@@ -1,0 +1,19 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+Metadata:
+  name: allow-app-traffic
+  namespace: production
+
+spec:
+  podSelector:
+    matchLabels:
+      app: secure-app
+
+  policyTypes:
+  - Ingress
+
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          app: secure-app

@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: secure-app
+  labels: 
+    app: secure-app
+
+spec:
+  replicas: 2
+
+  selector:
+    matchLabels:
+      app: secure-app
+
+  template:
+    metadata:
+      labels:
+        app: secure-app
+
+    spec:
+      serviceAccountName: app-sa
+
+      containers:
+      - name: secure-app
+        image: docker.io/shadab256/secure-app:latest
+        ports:
+        - containerPort: 5000
+
+        securityContext:
+          runAsNonRoot: true
+          allowPrivilegeEscalation: False
+
+          

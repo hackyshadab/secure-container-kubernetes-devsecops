@@ -1,0 +1,19 @@
+apiVersion: argooj.io/v1alpha1
+kind: Application
+Metadata:
+    name: secure-app
+
+spec:
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: production
+
+  source:
+    repoURL: https://github.com/hackyshadab/secure-container-kubernetes-devsecops
+    targetRevison: main
+    path: k8s/environments/prod
+
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
