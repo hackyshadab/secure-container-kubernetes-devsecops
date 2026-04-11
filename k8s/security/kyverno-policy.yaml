@@ -4,7 +4,7 @@ metadata:
   name: verify-image-signature
 
 spec:
-  validationFailureAction: enforce
+  validationFailureAction: Enforce
   rules:
   - name: check-image-signature
     match:
@@ -14,5 +14,8 @@ spec:
 
     verifyImages:
     - image: "docker.io/shadab256/*"
-      key: "cosign.pub"
-      
+      key: |
+        -----BEGIN PUBLIC KEY-----
+        MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE0p6Sy0jJm+HPBk87GpGK/VvVGDfg
+        r05VIGONNq6BzLg5b83c/ZwbBzx66Tp4m9cVB4m+GSxY0Axh6LPhnQU/ZA==
+        -----END PUBLIC KEY-----
