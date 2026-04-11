@@ -302,14 +302,6 @@ kubectl apply -f k8s/security/
 
 ---
 
-### 🔹 Kubernetes Events
-
-![Kubernetes Events](./images/k8s-events.png)
-
-👉 Shows policy violations and cluster activity timeline.
-
----
-
 ## 📊 Results
 
 - ✅ 100% policy enforcement at admission level  
