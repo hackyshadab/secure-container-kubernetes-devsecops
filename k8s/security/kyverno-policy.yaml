@@ -1,6 +1,6 @@
 apiVersion: kyverno.io/v1
 kind: ClusterPolicy
-Metadata:
+metadata:
   name: verify-image-signature
 
 spec:
