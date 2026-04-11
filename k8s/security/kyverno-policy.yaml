@@ -12,6 +12,11 @@ spec:
         kinds:
         - Pod
 
+    exclude:
+      resources:
+        namespaces:
+        - falco   
+
     verifyImages:
     - image: "docker.io/shadab256/*"
       key: |
