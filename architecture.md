@@ -94,7 +94,7 @@ Falco is used because:
 ## 3. Step-by-Step Request Flow
 
 ### Flow Diagram
-
+```mermaid
 flowchart LR
 
 subgraph CI/CD Pipeline
@@ -118,6 +118,7 @@ J --> K[Scheduler]
 K --> L[Running Pod]
 L --> M[Falco Monitoring]
 end
+```
 
 ### Detailed Flow
 
@@ -192,7 +193,7 @@ Purpose:
 ### GitHub Actions
 Used for build automation and security checks in CI.
 
-### Trivy or Grype
+### Trivy
 Used to detect known vulnerabilities before the image is trusted for deployment.
 
 ### Cosign
@@ -216,6 +217,7 @@ Used to limit lateral movement and reduce communication paths between workloads.
 ---
 
 ## 6. Textual Architecture Diagram
+```mermaid
 flowchart TB
 
 subgraph CI/CD Pipeline
@@ -243,6 +245,7 @@ G --> G2[Network Policies]
 
 G --> H[Falco Runtime Monitoring]
 end
+```
 
 ---
 
