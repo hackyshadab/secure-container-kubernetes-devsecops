@@ -231,7 +231,7 @@ end
 B4 --> C[Container Registry]
 
 subgraph GitOps Delivery
-C --> D[GitOps Repo\n(Kubernetes Manifests)]
+C --> D[GitOps Repo<br/>(Kubernetes Manifests)]
 D --> E[ArgoCD Sync]
 end
 
