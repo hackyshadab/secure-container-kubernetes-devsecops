@@ -1,144 +1,228 @@
-# 🛡️ Secure Container Deployment using Kubernetes + DevSecOps
-
+# Secure Kubernetes DevSecOps Platform
 ![Kubernetes](https://img.shields.io/badge/Kubernetes-Security-blue)
 ![DevSecOps](https://img.shields.io/badge/DevSecOps-Project-red)
 ![Kyverno](https://img.shields.io/badge/Kyverno-Policy--as--Code-purple)
 ![Falco](https://img.shields.io/badge/Falco-Runtime--Security-green)
 ![ArgoCD](https://img.shields.io/badge/ArgoCD-GitOps-orange)
 
-A production-grade **DevSecOps security architecture** built on Kubernetes that enforces security at every stage of the container lifecycle — from image verification to runtime threat detection.
+![Architecture Diagram](./images/architecture.png)
 
-This project demonstrates how modern enterprises secure containerized workloads using **policy-as-code, runtime security, and GitOps automation**.
+A production-grade Kubernetes security implementation that combines **GitHub Actions, container scanning, image signing, GitOps deployment, policy enforcement, and runtime threat detection** into a single end-to-end workflow.
 
----
 
-## 🎯 Key Objectives
-
-- Enforce non-root container execution  
-- Verify container image authenticity  
-- Detect runtime threats in real-time  
-- Implement GitOps-based secure deployment  
-- Build enterprise-grade Kubernetes security pipeline  
+This project demonstrates how modern teams secure containerized workloads in real-world environments where speed, traceability, and defense-in-depth must coexist. It is designed to reflect how enterprise DevSecOps teams protect the software supply chain and the Kubernetes runtime from build time to production.
 
 ---
 
-## 📌 Key Highlights
+## Executive Summary
 
-- 🔒 Enforced zero-trust container deployment using Kyverno  
-- 🚫 Blocked insecure workloads at admission level  
-- 🔍 Detected runtime anomalies using Falco  
-- 🔁 Implemented GitOps-based continuous deployment  
-- ⚡ Achieved real-time security monitoring inside Kubernetes  
----
+Most Kubernetes deployments fail security not because teams do nothing, but because they secure only one stage of the lifecycle. A container may be scanned during CI, but later deployed manually without verification. A cluster may be hardened, but still accept unsigned images. A workload may be admitted safely, but later abused at runtime.
 
-## 🏗️ Architecture Overview
+This project addresses that gap.
 
-![Architecture Diagram](./images/archi.png)
+It implements a complete Kubernetes DevSecOps control plane where:
 
-Include:
+- code is built through GitHub Actions,
+- images are scanned for vulnerabilities,
+- artifacts are signed using Cosign,
+- deployments are managed through ArgoCD and GitOps,
+- Kubernetes admission is enforced with Kyverno,
+- and runtime threats are observed with Falco.
 
-- Developer pushing code to GitHub  
-- GitHub Actions CI/CD pipeline  
-- Docker image build and push to Docker Hub  
-- ArgoCD pulling manifests (GitOps)  
-- Kubernetes cluster (Minikube)  
-
-Inside Kubernetes include:
-- Kyverno (Policy Engine)
-- Falco (Runtime Security)
-- Secure Application Pods
-
-### Flow:
-![Flow](./images/flowdia.png)
-
-### Security Layers:
-- Kyverno (Admission Control: block root containers, verify image signature)  
-- Falco (Runtime threat detection)
-
-Use glowing neon colors (blue, purple, red highlights) on a dark background.  
-Make it clean, modern, enterprise-level diagram.
-
----
-## 🛡️ Security Layers Breakdown
-
-| Layer              | Tool            | Purpose                          |
-|-------------------|----------------|----------------------------------|
-| CI/CD             | GitHub Actions | Secure build pipeline            |
-| Image Security    | Kyverno        | Verify image signatures          |
-| Admission Control | Kyverno        | Block insecure pods              |
-| Runtime Security  | Falco          | Detect live threats              |
-| GitOps            | ArgoCD         | Secure deployments               |
+The result is a realistic security architecture that protects the container lifecycle across **build, distribution, deployment, admission, and runtime**.
 
 ---
 
-## ⚙️ Tech Stack
+## Problem Statement
 
-- Kubernetes (Minikube)  
-- Kyverno – Policy as Code  
-- Falco – Runtime Threat Detection  
-- ArgoCD – GitOps Deployment  
-- Docker – Containerization  
-- GitHub Actions – CI/CD Pipeline  
+Kubernetes is powerful, but it expands the attack surface significantly when security is treated as an afterthought.
 
----
+Common risks include:
 
-## 🔐 Security Implementation
+- vulnerable container images entering production,
+- unsigned or tampered images being deployed,
+- privileged or root containers escaping isolation,
+- uncontrolled pod-to-pod communication,
+- direct kubectl-based changes bypassing change control,
+- and malicious runtime behavior that appears only after deployment.
 
-### 1️⃣ Kyverno Policies (Admission Control)
+In many organizations, these issues are the reason for container incidents, cluster compromise, and failed compliance audits.
 
-✔ Block root containers  
-✔ Enforce security best practices  
-✔ Verify container image signatures  
-
-Example:
-
-```yaml
-securityContext:
-  runAsNonRoot: true
-```
-
-👉 Prevents insecure containers from being deployed.
+This project models the controls enterprise teams use to reduce those risks.
 
 ---
 
-## 2️⃣ Image Signature Verification
+## Solution Overview
 
-- Only trusted images are allowed  
-- Prevents tampered or malicious containers  
-- Enforced using Kyverno `verifyImages` policy  
+The solution uses layered security controls to enforce trust and reduce blast radius at each stage:
 
----
+- **CI** builds and scans the container image.
+- **Cosign** signs the image to prove artifact integrity.
+- **ArgoCD** deploys through GitOps, not manual cluster access.
+- **Kyverno** blocks insecure workloads and verifies image signatures.
+- **Falco** monitors runtime activity for suspicious behavior.
+- **Kubernetes RBAC and Network Policies** restrict access and lateral movement.
 
-## 3️⃣ Runtime Security with Falco
-
-Falco continuously monitors system calls and detects:
-
-- Suspicious API server connections  
-- Privilege escalation attempts  
-- Unauthorized process execution  
-
-### Example Alert:
-
-```text
-Unexpected connection to K8s API Server from container
-```
-
-👉 Real-time threat detection 🔥
+This creates a defense-in-depth design where one control does not replace another.
 
 ---
 
-## 🔁 GitOps Workflow
+## Architecture Overview
 
-- Developer pushes code to GitHub  
-- CI/CD pipeline builds Docker image  
-- Image pushed to Docker Hub  
-- ArgoCD syncs Kubernetes manifests  
-- Kyverno enforces security policies  
-- Falco monitors runtime behavior  
+The architecture separates responsibilities across the software lifecycle:
+
+1. **Developer pushes code** to GitHub.
+2. **GitHub Actions** builds the container image.
+3. **Trivy or Grype** scans the image for known vulnerabilities.
+4. **Cosign** signs the image after the build and scan succeed.
+5. The image is pushed to a **container registry**.
+6. **ArgoCD** watches the Git repository and syncs Kubernetes manifests.
+7. **Kyverno** validates the workload at admission time.
+8. The workload runs inside **Kubernetes** with restricted permissions.
+9. **Falco** continuously observes runtime behavior and raises alerts on suspicious activity.
+
+![Architecture Diagram](./images/architecture.png)
+
+This architecture reflects a real enterprise pattern: **secure supply chain plus secure runtime**.
 
 ---
 
-## 📂 Project Structure
+## DevSecOps Pipeline Flow
+
+![Flow](./images/flowfln.png)
+
+### 1. Developer Commit
+A developer pushes application code to the repository.
+
+### 2. Build Stage
+GitHub Actions builds a container image from the Dockerfile.
+
+### 3. Vulnerability Scan
+The image is scanned using Trivy or Grype to detect known CVEs in the OS layer and application dependencies.
+
+### 4. Image Signing
+Cosign signs the image to create a cryptographic trust relationship between the build system and the artifact.
+
+### 5. Registry Push
+The signed image is pushed to a container registry.
+
+### 6. GitOps Update
+Kubernetes manifests are updated to reference the new image tag.
+
+### 7. ArgoCD Sync
+ArgoCD detects the Git change and applies the updated manifests to the cluster.
+
+### 8. Admission Enforcement
+Kyverno validates the workload before it is admitted into the cluster.
+
+### 9. Runtime Monitoring
+Falco monitors system calls and container behavior for suspicious activity.
+
+---
+
+## Security Layers
+
+| Layer | Tooling | Purpose |
+|---|---|---|
+| Source Control | GitHub | Code change tracking and review |
+| Build | GitHub Actions | Automated container build |
+| Vulnerability Scanning | Trivy / Grype | Detect known CVEs |
+| Supply Chain Integrity | Cosign | Sign container images |
+| Deployment Automation | ArgoCD | GitOps-based delivery |
+| Admission Control | Kyverno | Block insecure workloads |
+| Cluster Hardening | RBAC, NetworkPolicy | Limit access and movement |
+| Runtime Security | Falco | Detect live threats |
+| Audit and Traceability | Git + Kubernetes events | Track every change |
+
+---
+
+## Threat Model
+
+This project is designed around the most relevant container and Kubernetes threats.
+
+### Threats Addressed
+
+- **Unsigned image deployment**
+  - Prevented by Kyverno signature verification.
+- **Tampered image in registry**
+  - Reduced by Cosign signatures and admission verification.
+- **Privileged container execution**
+  - Reduced by non-root enforcement and security context restrictions.
+- **Lateral movement inside the cluster**
+  - Reduced by Network Policies.
+- **Unauthorized cluster changes**
+  - Reduced by GitOps and ArgoCD.
+- **Runtime compromise**
+  - Detected by Falco.
+- **Cluster misconfiguration**
+  - Reduced by Kubernetes policy enforcement and RBAC.
+
+### Security Assumptions
+
+- The Git repository is controlled and reviewed.
+- The registry is trusted, but image integrity must still be verified.
+- Cluster-admin access is tightly restricted.
+- Runtime detection is necessary because build-time scanning cannot stop every attack.
+
+---
+
+## Before vs After Security Comparison
+
+| Scenario | Before This Project | After This Project |
+|---|---|---|
+| Deploying images | Manual or loosely controlled | Signed and verified |
+| Kubernetes changes | Direct kubectl access | GitOps-controlled |
+| Root containers | Often allowed by default | Blocked by policy |
+| Image authenticity | Not guaranteed | Verified with Cosign + Kyverno |
+| Runtime visibility | Minimal | Falco detects suspicious behavior |
+| Audit trail | Fragmented | Centralized in Git and Kubernetes events |
+
+---
+
+## Tools & Tech Stack
+
+- **Kubernetes / Minikube** for local cluster deployment
+- **Docker** for image packaging
+- **GitHub Actions** for CI automation
+- **Trivy / Grype** for vulnerability scanning
+- **Cosign** for image signing
+- **ArgoCD** for GitOps deployment
+- **Kyverno** for admission control and policy-as-code
+- **Falco** for runtime threat detection
+
+---
+
+## Implementation Details
+
+### Kyverno Policies
+
+Kyverno enforces cluster policy at admission time. This project includes policies that:
+
+- block root containers,
+- restrict insecure security contexts,
+- verify that only signed images are admitted.
+
+This is important because build-time security does not matter if an attacker can still deploy an untrusted image.
+
+### Image Signing
+
+Cosign is used to cryptographically sign images after build and scan stages succeed. The signature establishes provenance and helps prevent unauthorized or tampered images from reaching production.
+
+### Falco Runtime Detection
+
+Falco monitors runtime activity and detects suspicious behavior such as:
+
+- shell execution inside containers,
+- unexpected file access,
+- abnormal process behavior,
+- and actions that resemble privilege escalation or compromise.
+
+Falco provides the last line of defense when an attack bypasses build-time controls.
+
+---
+
+
+## Repository Structure
 
 ```text
 secure-container-kubernetes-devsecops/
@@ -173,86 +257,51 @@ secure-container-kubernetes-devsecops/
 │       └── job.yaml
 │
 ├── .gitignore
+├── Architecture.md
 └── README.md
-
-
-````
-## 🧪 Security Testing
-
----
-
-### 🚫 Test 1: Root Container Block
-
-**Attempted Deployment:**
-
-```yaml
-runAsNonRoot: false
 ```
----
-
-❌ **Result:**
-
-```text
-admission webhook denied request
-```
----
-
-### 🚫 Test 2: Unsigned Image Block
-
-❌ **Result:**
-
-```text
-failed to verify image signature
-```
----
-
-### 🔍 Test 3: Runtime Threat Detection
-
-**Falco Detection:**
-
-```text
-Unexpected connection to K8s API Server
-```
----
-
-### ✅ Result:
-
-Runtime security system successfully detected malicious behavior in real time.
 
 ---
-## ⚡ How to Run This Project
 
-### 1. Start Kubernetes Cluster
+## How to Run
 
+### 1. Start the cluster
 ```bash
 minikube start
 ```
-### 2. Install Kyverno
 
-```bash
-kubectl create -f https://github.com/kyverno/kyverno/releases/latest/download/install.yaml
-```
-### 3. Install Falco
-
-```bash
-helm install falco falcosecurity/falco -n falco --create-namespace
-```
-### 4. Install ArgoCD
-
+### 2. Install ArgoCD
 ```bash
 kubectl create namespace argocd
 kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
 ```
-### 5. Apply Security Policies
 
+### 3. Install Kyverno
+```bash
+kubectl create namespace kyverno
+kubectl apply -f https://github.com/kyverno/kyverno/releases/latest/download/install.yaml
+```
+
+### 4. Install Falco
+```bash
+helm repo add falcosecurity https://falcosecurity.github.io/charts
+helm install falco falcosecurity/falco --namespace falco --create-namespace
+```
+
+### 5. Apply cluster policies
 ```bash
 kubectl apply -f k8s/security/
 ```
 
-
-## 📸 Screenshots
+### 6. Sync with ArgoCD
+```bash
+kubectl apply -f argocd/application.yaml
+```
 
 ---
+
+## Screenshots
+
 
 ### 🔹 Kubernetes Cluster Overview
 
@@ -302,46 +351,80 @@ kubectl apply -f k8s/security/
 
 ---
 
-## 📊 Results
+## Testing & Validation
 
-- ✅ 100% policy enforcement at admission level  
-- ✅ Real-time runtime threat detection  
-- ✅ Secure GitOps-based deployment  
-- ✅ Enterprise-ready Kubernetes security stack  
+The project was validated through security tests that demonstrated enforcement at multiple stages.
 
----
+### Admission Control Test
+A deployment using an unsigned or invalid image was blocked by Kyverno.
 
-## ⚠️ Challenges Faced
+### Non-Root Enforcement Test
+A workload attempting to run without the required security context was rejected.
 
-- Docker Hub rate limiting during image verification  
-- Kyverno policy conflicts with system namespaces  
-- Falco DaemonSet requiring privileged access  
+### Runtime Security Test
+A test workload was used to trigger Falco alerts through suspicious container activity.
 
----
-
-## 🧠 Learnings
-
-- Kubernetes security operates in multiple layers: code → build → deploy → runtime  
-- Policy-as-Code prevents misconfigurations before deployment  
-- Runtime security is critical for detecting live threats in production environments  
-- GitOps improves consistency, traceability, and rollback safety  
+These tests prove that the pipeline does not just build and deploy, but actively enforces security expectations.
 
 ---
 
-## 🚀 Future Enhancements
+## Challenges & Fixes
 
-- Integrate SIEM platforms (Splunk / ELK Stack) for centralized logging and monitoring  
-- Add Falco alerting via Slack / Webhook notifications for real-time response  
-- Compare Kyverno with OPA Gatekeeper for policy enforcement evaluation  
-- Add vulnerability scanning using Trivy / Grype in CI/CD pipeline  
-- Implement image signing using Cosign (Sigstore) for supply chain security assurance  
+### Docker Hub Rate Limiting
+While testing image verification, Docker Hub rate limiting impacted unauthenticated pulls. This was resolved by authenticating Docker access.
+
+### Kyverno Policy Conflicts
+Falco required elevated access, which conflicted with strict non-root policies. The solution was to exclude trusted system namespaces and handle policy scope carefully.
+
+### Falco Initialization on Minikube
+Falco required runtime driver setup and eBPF compatibility. This was resolved by using an appropriate Falco installation mode and validating cluster compatibility.
+
+These are realistic operational issues, not toy-project issues, which makes the project more interview-relevant.
 
 ---
 
-## 🙏 Acknowledgement
+## Results & Impact
 
-Special thanks to:
+This project demonstrates:
 
-- Open-source Kubernetes community  
-- Cloud-native ecosystem contributors  
-- Enterprise DevSecOps best practices  
+- secure image lifecycle control,
+- policy-based Kubernetes admission enforcement,
+- GitOps deployment discipline,
+- runtime threat detection,
+- and layered cluster hardening.
+
+It models how enterprise teams reduce risk without sacrificing deployment speed or traceability.
+
+---
+
+## Real-world Use Cases
+
+This architecture is relevant to:
+
+- **Fintech and banking platforms** where trust and compliance matter,
+- **SaaS platforms** where rapid delivery must remain safe,
+- **Healthcare systems** handling regulated workloads,
+- **Enterprise internal platforms** where multiple teams share Kubernetes infrastructure.
+
+Any organization running containers at scale can use these patterns to reduce supply chain and runtime risk.
+
+---
+
+## Future Enhancements
+
+Possible next-stage improvements include:
+
+- integration with Slack, webhook, or SIEM alerting,
+- centralized log aggregation with ELK or Splunk,
+- OPA Gatekeeper comparison for policy evaluation,
+- image promotion workflows across dev, staging, and production,
+- multi-cluster GitOps,
+- and automated remediation for runtime threats.
+
+---
+
+## Project Summary
+
+This project implements a secure Kubernetes deployment architecture using GitOps, container signing, policy enforcement, and runtime monitoring. It demonstrates an enterprise-style DevSecOps workflow that protects the container lifecycle from code commit to runtime execution. The system combines GitHub Actions, Trivy or Grype, Cosign, ArgoCD, Kyverno, and Falco to enforce security across build, supply chain, deployment, admission, and runtime layers.
+
+---
