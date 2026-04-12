@@ -23,7 +23,7 @@ spec:
 
       containers:
       - name: secure-app
-        image: docker.io/shadab256/secure-app:b7714358c6a7c6fef758018b096f1c6393dc8433
+        image: docker.io/shadab256/secure-app:ddac3922a481b183849963783ceebc47feffb5bf
         ports:
         - containerPort: 5000
 
