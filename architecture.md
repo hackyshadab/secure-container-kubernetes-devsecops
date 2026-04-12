@@ -1,6 +1,7 @@
 # Architecture Overview
 
-![Architecture](../images/architecture.png)
+![Architecture Diagram](./images/architecture.png)
+
 **This diagram shows the end-to-end secure DevSecOps flow from code commit to runtime monitoring.**
 
 This document explains the internal design of the Secure Kubernetes DevSecOps Platform and how each control contributes to end-to-end security.
